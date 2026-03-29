@@ -124,7 +124,7 @@ The project includes an interactive browser demo deployed on GitHub Pages:
 | 🐾 Pets | Filterable pet gallery (by species & status) |
 | 👥 Adopters | Full adopter profiles and preferences |
 | 🤝 Matchmaker | Pick any adopter → see top-5 compatible pets with score bars + 7-criterion breakdown |
-| 💻 SQL Explorer | Run all 8 pre-built queries or write custom SQL against the live in-browser database |
+| 💻 SQL Explorer | Run all 10 pre-built queries or write custom SQL against the live in-browser database |
 
 ### Enabling GitHub Pages
 
