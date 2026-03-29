@@ -143,6 +143,63 @@
     /* Footer */
     footer { text-align: center; padding: 24px; color: var(--muted); font-size: .78rem; border-top: 1px solid var(--border); margin-top: 8px; }
     footer a { color: var(--primary); text-decoration: none; }
+
+    /* ===== Dark Mode ===== */
+    [data-theme="dark"] { --bg:#0f172a; --card:#1e293b; --text:#e2e8f0; --muted:#94a3b8; --border:#334155; --shadow:0 1px 3px rgba(0,0,0,.3),0 4px 16px rgba(0,0,0,.2); }
+    [data-theme="dark"] th { background:#1a2332; color:#94a3b8; }
+    [data-theme="dark"] tr:hover td { background:#253245; }
+    [data-theme="dark"] .sql-ta { background:#020617; color:#e2e8f0; border-color:#334155; }
+    [data-theme="dark"] .adopter-profile { background:linear-gradient(135deg,#1e293b,#1a1a2e); border-color:#4f46e5; }
+    [data-theme="dark"] .ptag { background:#312e81; color:#a5b4fc; }
+    [data-theme="dark"] .pt { background:#1e293b; color:#94a3b8; }
+    [data-theme="dark"] .fbtn { background:var(--card); border-color:var(--border); color:var(--muted); }
+    [data-theme="dark"] .qsel { background:var(--card); color:var(--text); border-color:var(--border); }
+    body,main,.card,.stat-card,.pet-card,.tabs,.tab-btn,.match-card,.mm-select,.fbtn { transition: background .3s, color .3s, border-color .3s, box-shadow .3s; }
+    .theme-toggle { background:rgba(255,255,255,.15); border:1px solid rgba(255,255,255,.3); color:#fff; width:42px; height:42px; border-radius:50%; cursor:pointer; font-size:1.2rem; display:flex; align-items:center; justify-content:center; transition:background .2s,transform .2s; flex-shrink:0; }
+    .theme-toggle:hover { background:rgba(255,255,255,.28); transform:scale(1.1); }
+
+    /* ===== Entrance Animations ===== */
+    @keyframes fadeInUp { from { opacity:0; transform:translateY(24px); } to { opacity:1; transform:translateY(0); } }
+    @keyframes fadeInLeft { from { opacity:0; transform:translateX(-20px); } to { opacity:1; transform:translateX(0); } }
+    @keyframes fadeInScale { from { opacity:0; transform:scale(.92); } to { opacity:1; transform:scale(1); } }
+    .anim-up { animation: fadeInUp .5s ease both; }
+    .anim-left { animation: fadeInLeft .5s ease both; }
+    .anim-scale { animation: fadeInScale .45s ease both; }
+
+    /* ===== Charts ===== */
+    .chart-container { position:relative; max-width:100%; height:260px; }
+    .dash-grid .card { min-height:320px; }
+
+    /* ===== Pet Images ===== */
+    .pet-img { width:72px; height:72px; border-radius:50%; object-fit:cover; margin-bottom:10px; border:3px solid var(--border); background:var(--bg); }
+    .m-img { width:44px; height:44px; border-radius:50%; object-fit:cover; border:2px solid var(--border); flex-shrink:0; }
+
+    /* ===== How It Works ===== */
+    .hiw-hero { text-align:center; margin-bottom:32px; }
+    .hiw-hero h2 { font-size:1.5rem; font-weight:800; margin-bottom:8px; }
+    .hiw-hero p { color:var(--muted); font-size:.9rem; max-width:540px; margin:0 auto; }
+    .hiw-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(280px,1fr)); gap:16px; margin-bottom:28px; }
+    .hiw-card { background:var(--card); border:1px solid var(--border); border-radius:var(--radius); padding:20px; box-shadow:var(--shadow); transition:transform .2s,box-shadow .2s; position:relative; overflow:hidden; }
+    .hiw-card:hover { transform:translateY(-3px); box-shadow:0 6px 24px rgba(0,0,0,.12); }
+    .hiw-card::before { content:''; position:absolute; top:0; left:0; right:0; height:4px; border-radius:var(--radius) var(--radius) 0 0; }
+    .hiw-card:nth-child(1)::before { background:linear-gradient(90deg,#6366f1,#8b5cf6); }
+    .hiw-card:nth-child(2)::before { background:linear-gradient(90deg,#3b82f6,#06b6d4); }
+    .hiw-card:nth-child(3)::before { background:linear-gradient(90deg,#10b981,#34d399); }
+    .hiw-card:nth-child(4)::before { background:linear-gradient(90deg,#f59e0b,#fbbf24); }
+    .hiw-card:nth-child(5)::before { background:linear-gradient(90deg,#ef4444,#f87171); }
+    .hiw-card:nth-child(6)::before { background:linear-gradient(90deg,#ec4899,#f472b6); }
+    .hiw-card:nth-child(7)::before { background:linear-gradient(90deg,#8b5cf6,#a78bfa); }
+    .hiw-icon { font-size:2rem; margin-bottom:8px; }
+    .hiw-label { font-size:.88rem; font-weight:700; margin-bottom:4px; }
+    .hiw-desc { font-size:.78rem; color:var(--muted); line-height:1.5; margin-bottom:8px; }
+    .hiw-pts { display:inline-flex; align-items:center; gap:4px; background:linear-gradient(135deg,#6366f1,#8b5cf6); color:#fff; font-size:.72rem; font-weight:700; padding:3px 10px; border-radius:100px; }
+    .hiw-summary { background:linear-gradient(135deg,#667eea22,#764ba222); border:1px solid var(--primary); border-radius:var(--radius); padding:24px; text-align:center; }
+    .hiw-summary h3 { font-size:1.1rem; font-weight:800; margin-bottom:8px; }
+    .hiw-formula { font-family:'Cascadia Code','Fira Code',monospace; font-size:.82rem; color:var(--muted); background:var(--card); padding:12px; border-radius:8px; margin-top:12px; display:inline-block; border:1px solid var(--border); }
+
+    /* ===== PDF Export Button ===== */
+    .pdf-btn { background:linear-gradient(135deg,#ef4444,#f97316); color:#fff; border:none; padding:10px 20px; border-radius:8px; font-size:.85rem; font-weight:600; cursor:pointer; transition:transform .2s,box-shadow .2s; display:inline-flex; align-items:center; gap:6px; margin-top:12px; }
+    .pdf-btn:hover { transform:translateY(-2px); box-shadow:0 4px 16px rgba(239,68,68,.35); }
   </style>
 </head>
 <body>
@@ -170,7 +227,10 @@
           </div>
         </div>
       </div>
-      <a href="https://github.com/Hiruthickroshan/Pet-Adoption-Matchmaker" target="_blank" rel="noopener" class="gh-btn">⭐ View on GitHub</a>
+      <div style="display:flex;align-items:center;gap:10px">
+        <button class="theme-toggle" id="theme-toggle" onclick="toggleTheme()" title="Toggle dark mode">🌙</button>
+        <a href="https://github.com/Hiruthickroshan/Pet-Adoption-Matchmaker" target="_blank" rel="noopener" class="gh-btn">⭐ View on GitHub</a>
+      </div>
     </div>
   </header>
 
@@ -180,6 +240,7 @@
     <button class="tab-btn" onclick="showTab('adopters')">👥 Adopters</button>
     <button class="tab-btn" onclick="showTab('matchmaker')">🤝 Matchmaker</button>
     <button class="tab-btn" onclick="showTab('sql')">💻 SQL Explorer</button>
+    <button class="tab-btn" onclick="showTab('howitworks')">⚙️ How It Works</button>
   </nav>
 
   <main>
@@ -187,6 +248,16 @@
     <div id="tab-dashboard" class="tab-panel active">
       <div class="stats-grid" id="stats-grid"></div>
       <div class="dash-grid">
+        <div class="card">
+          <div class="card-title">🍩 Species Distribution</div>
+          <div class="chart-container"><canvas id="chart-species"></canvas></div>
+        </div>
+        <div class="card">
+          <div class="card-title">📊 Match Status Breakdown</div>
+          <div class="chart-container"><canvas id="chart-matches"></canvas></div>
+        </div>
+      </div>
+      <div class="dash-grid" style="margin-top:20px">
         <div class="card">
           <div class="card-title">🤝 Recent Matches</div>
           <div class="table-wrap" id="recent-matches"></div>
@@ -223,6 +294,21 @@
           <option value="">— Select an Adopter —</option>
         </select>
         <div id="match-results"></div>
+        <div id="pdf-btn-wrap" style="display:none"><button class="pdf-btn" onclick="exportMatchPDF()">📄 Download Match Report</button></div>
+      </div>
+    </div>
+
+    <!-- How It Works -->
+    <div id="tab-howitworks" class="tab-panel">
+      <div class="hiw-hero">
+        <h2>⚙️ How the Scoring Engine Works</h2>
+        <p>Every pet–adopter pair is evaluated against 7 weighted criteria to produce a compatibility score from 0 to 100.</p>
+      </div>
+      <div class="hiw-grid" id="hiw-grid"></div>
+      <div class="hiw-summary">
+        <h3>🧮 Total Score Formula</h3>
+        <p style="color:var(--muted);font-size:.85rem">Each criterion is evaluated independently. Points are summed to produce the final score.</p>
+        <div class="hiw-formula">Score = Species(20) + Size(20) + Energy(20) + Kids(15) + Pets(10) + Lifestyle(10) + Activity(5) = <strong style="color:var(--primary)">100</strong></div>
       </div>
     </div>
 
@@ -264,6 +350,9 @@
   </footer>
 </div>
 
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/jspdf-autotable@3.8.2/dist/jspdf.plugin.autotable.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/sql.js@1.10.2/dist/sql-wasm.js"></script>
 <script>
 'use strict';
@@ -538,6 +627,23 @@ function petEmoji(species) {
   return map[species] || '🐾';
 }
 
+function petImage(petId, species) {
+  const seed = petId * 137;
+  const w = 150, h = 150;
+  const imgMap = {
+    Dog:   `https://placedog.net/${w}/${h}?id=${(seed % 90) + 1}`,
+    Cat:   `https://placekitten.com/${w}/${h}?image=${(seed % 16) + 1}`,
+    Rabbit:`https://placebear.com/${w}/${h}`,
+    Bird:  `https://placebear.com/g/${w}/${h}`
+  };
+  return imgMap[species] || `https://placebear.com/${w}/${h}`;
+}
+
+function imgTag(petId, species, cls) {
+  const emoji = petEmoji(species);
+  return `<img src="${petImage(petId, species)}" alt="${species}" class="${cls}" onerror="this.outerHTML='<div class=\\'pet-emoji\\'>${emoji}</div>'">`;
+}
+
 function boolIcon(v) {
   return v ? '<span style="color:#22c55e">✓</span>' : '<span style="color:#ef4444">✗</span>';
 }
@@ -578,8 +684,10 @@ function showTab(id) {
   document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
   document.getElementById('tab-' + id).classList.add('active');
   const btns = document.querySelectorAll('.tab-btn');
-  const labels = { dashboard:0, pets:1, adopters:2, matchmaker:3, sql:4 };
+  const labels = { dashboard:0, pets:1, adopters:2, matchmaker:3, sql:4, howitworks:5 };
   btns[labels[id]].classList.add('active');
+  // Trigger entrance animations
+  animateChildren('#tab-' + id);
 }
 
 /* =========================================================
@@ -656,14 +764,14 @@ function renderPetCards() {
   const pets = runQuery(sql, params);
   const grid = document.getElementById('pets-grid');
   if (!pets.length) { grid.innerHTML = '<p class="no-results">No pets match the current filters.</p>'; return; }
-  grid.innerHTML = pets.map(p => {
+  grid.innerHTML = pets.map((p, idx) => {
     const tags = [p.size, p.energy_level + ' energy', p.age_years + ' yrs',
       p.good_with_kids ? '👧 kids' : null,
       p.good_with_pets ? '🐾 pets' : null,
       p.indoor_friendly ? '🏠 indoor' : '🌳 outdoor'
     ].filter(Boolean).map(t => `<span class="pt">${t}</span>`).join('');
-    return `<div class="pet-card">
-      <div class="pet-emoji">${petEmoji(p.species)}</div>
+    return `<div class="pet-card anim-up" style="animation-delay:${idx * 60}ms">
+      ${imgTag(p.pet_id, p.species, 'pet-img')}
       <div class="pet-name">${p.name} ${statusBadge(p.status)}</div>
       <div class="pet-breed">${p.breed || p.species}</div>
       <div class="pet-tags">${tags}</div>
@@ -778,9 +886,9 @@ function renderMatchResults() {
   const matchCards = matches.map((m, i) => {
     const color = scoreColor(m.compatibility_score);
     return `
-      <div class="match-card">
+      <div class="match-card anim-left" style="animation-delay:${i * 80}ms">
         <div class="m-rank">${medals[i]}</div>
-        <div class="m-emoji">${petEmoji(m.species)}</div>
+        ${imgTag(m.pet_id, m.species, 'm-img')}
         <div class="m-info">
           <div class="m-name">${m.pet_name}
             <span class="b b-s" style="font-size:.7rem">${m.species} · ${m.breed || ''}</span>
@@ -795,6 +903,10 @@ function renderMatchResults() {
   container.innerHTML = profileHtml +
     `<p style="font-size:.82rem;color:var(--muted);margin-bottom:12px">Top ${matches.length} compatible pets for <strong>${adopter.full_name}</strong>:</p>` +
     matchCards;
+
+  // Show PDF export button
+  document.getElementById('pdf-btn-wrap').style.display = 'block';
+  window._lastMatchData = { adopter, matches };
 }
 
 /* =========================================================
@@ -841,9 +953,186 @@ function clearSqlExplorer() {
 }
 
 /* =========================================================
+   Dark Mode
+   ========================================================= */
+function toggleTheme() {
+  const html = document.documentElement;
+  const isDark = html.getAttribute('data-theme') === 'dark';
+  html.setAttribute('data-theme', isDark ? 'light' : 'dark');
+  document.getElementById('theme-toggle').textContent = isDark ? '🌙' : '☀️';
+  localStorage.setItem('theme', isDark ? 'light' : 'dark');
+  // Update charts for new theme
+  if (window._speciesChart) renderCharts();
+}
+
+function loadTheme() {
+  const saved = localStorage.getItem('theme');
+  if (saved === 'dark') {
+    document.documentElement.setAttribute('data-theme', 'dark');
+    document.getElementById('theme-toggle').textContent = '☀️';
+  }
+}
+
+/* =========================================================
+   Charts (Chart.js)
+   ========================================================= */
+let _speciesChart, _matchChart;
+
+function renderCharts() {
+  const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+  const textColor = isDark ? '#e2e8f0' : '#1e293b';
+  const gridColor = isDark ? '#334155' : '#e2e8f0';
+
+  // Species Distribution Doughnut
+  const speciesData = runQuery(`SELECT species, COUNT(*) AS cnt FROM Pets GROUP BY species ORDER BY cnt DESC`);
+  const speciesColors = ['#6366f1','#3b82f6','#10b981','#f59e0b','#ef4444'];
+
+  if (_speciesChart) _speciesChart.destroy();
+  _speciesChart = new Chart(document.getElementById('chart-species'), {
+    type: 'doughnut',
+    data: {
+      labels: speciesData.map(r => r.species),
+      datasets: [{ data: speciesData.map(r => r.cnt), backgroundColor: speciesColors, borderWidth: 2, borderColor: isDark ? '#1e293b' : '#fff' }]
+    },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      plugins: {
+        legend: { position: 'bottom', labels: { color: textColor, padding: 14, font: { size: 12 } } }
+      }
+    }
+  });
+
+  // Match Status Bar Chart
+  const matchData = runQuery(`SELECT status, COUNT(*) AS cnt FROM Matches GROUP BY status ORDER BY cnt DESC`);
+  const statusColors = { Suggested:'#3b82f6', Approved:'#22c55e', Rejected:'#ef4444', Adopted:'#8b5cf6' };
+
+  if (_matchChart) _matchChart.destroy();
+  _matchChart = new Chart(document.getElementById('chart-matches'), {
+    type: 'bar',
+    data: {
+      labels: matchData.map(r => r.status),
+      datasets: [{ label: 'Matches', data: matchData.map(r => r.cnt), backgroundColor: matchData.map(r => statusColors[r.status] || '#6366f1'), borderRadius: 6, barThickness: 40 }]
+    },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      plugins: { legend: { display: false } },
+      scales: {
+        x: { ticks: { color: textColor }, grid: { display: false } },
+        y: { beginAtZero: true, ticks: { color: textColor, stepSize: 1 }, grid: { color: gridColor } }
+      }
+    }
+  });
+}
+
+/* =========================================================
+   PDF Export (jsPDF)
+   ========================================================= */
+function exportMatchPDF() {
+  const data = window._lastMatchData;
+  if (!data) return;
+  const { jsPDF } = window.jspdf;
+  const doc = new jsPDF();
+
+  // Title
+  doc.setFontSize(20);
+  doc.setTextColor(99, 102, 241);
+  doc.text('Pet Adoption Matchmaker', 14, 22);
+  doc.setFontSize(10);
+  doc.setTextColor(100);
+  doc.text('Compatibility Report — ' + new Date().toLocaleDateString(), 14, 30);
+
+  // Adopter profile
+  doc.setFontSize(14);
+  doc.setTextColor(30);
+  doc.text('Adopter: ' + data.adopter.full_name, 14, 44);
+  doc.setFontSize(10);
+  doc.setTextColor(100);
+  const profile = [
+    `Living: ${data.adopter.living_space}${data.adopter.has_yard ? ' + yard' : ''}`,
+    `Activity: ${data.adopter.activity_level}`,
+    `Experience: ${data.adopter.experience_level}`,
+    `Prefers: ${data.adopter.preferred_species || 'Any'} / ${data.adopter.preferred_size} / ${data.adopter.preferred_energy}`
+  ].join('  |  ');
+  doc.text(profile, 14, 52);
+
+  // Match table
+  doc.autoTable({
+    startY: 60,
+    head: [['Rank', 'Pet', 'Species', 'Breed', 'Size', 'Energy', 'Score']],
+    body: data.matches.map((m, i) => [
+      '#' + (i + 1), m.pet_name, m.species, m.breed || '-', m.size, m.energy_level, m.compatibility_score
+    ]),
+    headStyles: { fillColor: [99, 102, 241] },
+    styles: { fontSize: 9 },
+    alternateRowStyles: { fillColor: [245, 247, 250] }
+  });
+
+  // Footer
+  const pageHeight = doc.internal.pageSize.height;
+  doc.setFontSize(8);
+  doc.setTextColor(150);
+  doc.text('Generated by Pet Adoption Matchmaker — github.com/Hiruthickroshan/Pet-Adoption-Matchmaker', 14, pageHeight - 10);
+
+  doc.save(`match-report-${data.adopter.full_name.replace(/\s+/g, '-').toLowerCase()}.pdf`);
+}
+
+/* =========================================================
+   How It Works — populate criteria cards
+   ========================================================= */
+function renderHowItWorks() {
+  const criteria = [
+    { icon: '🐾', label: 'Species Match', pts: 20, desc: 'Does the pet species match the adopter\'s preference? Full points if species matches or adopter has no preference.' },
+    { icon: '📏', label: 'Size Preference', pts: 20, desc: 'Does the pet size match? Full points if size matches or adopter accepts any size.' },
+    { icon: '⚡', label: 'Energy Level', pts: 20, desc: 'Does the pet\'s energy level match the adopter\'s preferred energy? Supports "Any" as wildcard.' },
+    { icon: '👧', label: 'Kid-Friendly', pts: 15, desc: 'If adopter has children, the pet must be good with kids. Full points if no children or pet is kid-safe.' },
+    { icon: '🐾', label: 'Pet-Friendly', pts: 10, desc: 'If adopter has other pets, the new pet should be sociable. Full points if no existing pets or pet is compatible.' },
+    { icon: '🏠', label: 'Living Space', pts: 10, desc: 'Apartment dwellers need indoor-friendly pets. House and farm owners automatically qualify.' },
+    { icon: '🏃', label: 'Activity Alignment', pts: 5, desc: 'Active↔High, Moderate↔Medium, Sedentary↔Low. Bonus points when activity levels align perfectly.' }
+  ];
+  const grid = document.getElementById('hiw-grid');
+  grid.innerHTML = criteria.map((c, i) => `
+    <div class="hiw-card anim-up" style="animation-delay:${i * 80}ms">
+      <div class="hiw-icon">${c.icon}</div>
+      <div class="hiw-label">${c.label}</div>
+      <div class="hiw-desc">${c.desc}</div>
+      <div class="hiw-pts">+${c.pts} points</div>
+    </div>
+  `).join('');
+}
+
+/* =========================================================
+   Animation helper
+   ========================================================= */
+function animateChildren(selector) {
+  const el = document.querySelector(selector);
+  if (!el) return;
+  const items = el.querySelectorAll('.anim-up,.anim-left,.anim-scale');
+  items.forEach(item => {
+    item.style.animation = 'none';
+    item.offsetHeight; // force reflow
+    item.style.animation = '';
+  });
+}
+
+/* =========================================================
+   Dashboard stat animations
+   ========================================================= */
+const origRenderDashboard = renderDashboard;
+renderDashboard = function() {
+  origRenderDashboard();
+  // Add animations to stat cards
+  document.querySelectorAll('.stat-card').forEach((card, i) => {
+    card.classList.add('anim-up');
+    card.style.animationDelay = `${i * 100}ms`;
+  });
+};
+
+/* =========================================================
    Init
    ========================================================= */
 async function init() {
+  loadTheme();
+
   // Ctrl+Enter keyboard shortcut for SQL Explorer
   document.getElementById('sql-input').addEventListener('keydown', e => {
     if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') {
@@ -864,10 +1153,12 @@ async function init() {
     db.exec(VIEW_SQL);
 
     renderDashboard();
+    renderCharts();
     renderPetFilters();
     renderPetCards();
     renderAdopters();
     populateAdopterDropdown();
+    renderHowItWorks();
 
     document.getElementById('loading').style.display = 'none';
     document.getElementById('app').style.display = 'block';
