@@ -128,10 +128,11 @@ The project includes an interactive browser demo deployed on GitHub Pages:
 
 ### Enabling GitHub Pages
 
+The repository uses a GitHub Actions workflow (`.github/workflows/deploy.yml`) that automatically enables and deploys GitHub Pages on every push to `main`.
+
 1. Go to **Settings → Pages** in the repository.
-2. Under *Source*, select **Deploy from a branch**.
-3. Choose **main** branch and **/ (root)** folder.
-4. Save — the site will be live at the URL above within a minute.
+2. Under *Source*, select **GitHub Actions** (not "Deploy from a branch").
+3. Push any change to `main` — the workflow will enable Pages and deploy the site automatically.
 
 ---
 
