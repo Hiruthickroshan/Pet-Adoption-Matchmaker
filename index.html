@@ -1,0 +1,869 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>🐾 Pet Adoption Matchmaker — Live Demo</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --primary: #6366f1;
+      --primary-dark: #4f46e5;
+      --bg: #f1f5f9;
+      --card: #ffffff;
+      --text: #1e293b;
+      --muted: #64748b;
+      --border: #e2e8f0;
+      --radius: 12px;
+      --shadow: 0 1px 3px rgba(0,0,0,.08), 0 4px 16px rgba(0,0,0,.06);
+    }
+    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; }
+
+    /* Loading */
+    #loading { position: fixed; inset: 0; background: linear-gradient(135deg,#667eea,#764ba2); display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 9999; color: #fff; gap: 16px; }
+    .paw-spin { font-size: 4rem; animation: spin 1.5s linear infinite; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    #loading p { font-size: 1rem; opacity: .85; }
+
+    /* Header */
+    header { background: linear-gradient(135deg,#667eea,#764ba2); color: #fff; padding: 22px 24px; }
+    .hdr { max-width: 1200px; margin: 0 auto; display: flex; align-items: center; justify-content: space-between; gap: 16px; flex-wrap: wrap; }
+    .hdr-left { display: flex; align-items: center; gap: 16px; }
+    .logo { font-size: 3rem; line-height: 1; }
+    .hdr-left h1 { font-size: 1.55rem; font-weight: 800; line-height: 1.2; }
+    .hdr-left p { font-size: .82rem; opacity: .8; margin-top: 4px; }
+    .badges { display: flex; gap: 6px; margin-top: 10px; flex-wrap: wrap; }
+    .badge-pill { background: rgba(255,255,255,.18); color: #fff; font-size: .72rem; padding: 2px 10px; border-radius: 100px; border: 1px solid rgba(255,255,255,.3); }
+    .gh-btn { background: rgba(255,255,255,.15); color: #fff; text-decoration: none; padding: 9px 18px; border-radius: 8px; font-size: .88rem; font-weight: 600; border: 1px solid rgba(255,255,255,.3); transition: background .2s; white-space: nowrap; }
+    .gh-btn:hover { background: rgba(255,255,255,.28); }
+
+    /* Tabs */
+    .tabs { background: var(--card); border-bottom: 1px solid var(--border); padding: 0 20px; display: flex; gap: 2px; overflow-x: auto; position: sticky; top: 0; z-index: 100; box-shadow: 0 1px 4px rgba(0,0,0,.06); scrollbar-width: none; }
+    .tabs::-webkit-scrollbar { display: none; }
+    .tab-btn { background: none; border: none; padding: 14px 16px; cursor: pointer; font-size: .875rem; font-weight: 500; color: var(--muted); border-bottom: 3px solid transparent; white-space: nowrap; transition: all .2s; }
+    .tab-btn:hover { color: var(--primary); }
+    .tab-btn.active { color: var(--primary); border-bottom-color: var(--primary); }
+
+    /* Main */
+    main { max-width: 1200px; margin: 0 auto; padding: 24px 20px; }
+    .tab-panel { display: none; }
+    .tab-panel.active { display: block; }
+
+    /* Cards */
+    .card { background: var(--card); border-radius: var(--radius); padding: 20px; box-shadow: var(--shadow); border: 1px solid var(--border); }
+    .card-title { font-size: .95rem; font-weight: 700; margin-bottom: 16px; display: flex; align-items: center; gap: 8px; }
+
+    /* Stats */
+    .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(170px,1fr)); gap: 16px; margin-bottom: 24px; }
+    .stat-card { background: var(--card); border-radius: var(--radius); padding: 20px; box-shadow: var(--shadow); border: 1px solid var(--border); text-align: center; }
+    .stat-card .si { font-size: 2rem; margin-bottom: 6px; }
+    .stat-card .sv { font-size: 2.2rem; font-weight: 800; color: var(--primary); line-height: 1; }
+    .stat-card .sl { font-size: .72rem; color: var(--muted); margin-top: 4px; text-transform: uppercase; letter-spacing: .05em; }
+
+    /* Tables */
+    .table-wrap { overflow-x: auto; }
+    table { width: 100%; border-collapse: collapse; font-size: .85rem; }
+    th { background: #f8fafc; color: var(--muted); font-weight: 600; font-size: .72rem; text-transform: uppercase; letter-spacing: .05em; padding: 10px 14px; text-align: left; border-bottom: 1px solid var(--border); white-space: nowrap; }
+    td { padding: 11px 14px; border-bottom: 1px solid var(--border); vertical-align: middle; }
+    tr:last-child td { border-bottom: none; }
+    tr:hover td { background: #fafbfc; }
+
+    /* Inline badges */
+    .b { display: inline-flex; align-items: center; font-size: .72rem; font-weight: 600; padding: 2px 9px; border-radius: 100px; white-space: nowrap; }
+    .b-g { background: #dcfce7; color: #166534; }
+    .b-b { background: #dbeafe; color: #1e40af; }
+    .b-y { background: #fef9c3; color: #854d0e; }
+    .b-r { background: #fee2e2; color: #991b1b; }
+    .b-p { background: #ede9fe; color: #5b21b6; }
+    .b-s { background: #f1f5f9; color: #475569; }
+
+    /* Score bar */
+    .sc-wrap { display: flex; align-items: center; gap: 8px; min-width: 130px; }
+    .sc-bg { flex: 1; background: var(--border); border-radius: 100px; height: 7px; overflow: hidden; }
+    .sc-fill { height: 100%; border-radius: 100px; }
+    .sc-num { font-weight: 700; font-size: .85rem; min-width: 32px; text-align: right; }
+
+    /* Pet cards */
+    .filter-bar { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 20px; align-items: center; }
+    .fbtn { background: var(--card); border: 1px solid var(--border); color: var(--muted); padding: 6px 14px; border-radius: 100px; cursor: pointer; font-size: .82rem; font-weight: 500; transition: all .2s; }
+    .fbtn:hover, .fbtn.active { background: var(--primary); color: #fff; border-color: var(--primary); }
+    .fbtn-sep { width: 1px; background: var(--border); height: 28px; margin: 0 4px; }
+    .pets-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(230px,1fr)); gap: 16px; }
+    .pet-card { background: var(--card); border-radius: var(--radius); padding: 18px; box-shadow: var(--shadow); border: 1px solid var(--border); transition: transform .18s, box-shadow .18s; }
+    .pet-card:hover { transform: translateY(-3px); box-shadow: 0 6px 24px rgba(0,0,0,.11); }
+    .pet-emoji { font-size: 2.4rem; margin-bottom: 10px; }
+    .pet-name { font-size: 1rem; font-weight: 700; }
+    .pet-breed { font-size: .78rem; color: var(--muted); margin-bottom: 10px; }
+    .pet-tags { display: flex; flex-wrap: wrap; gap: 4px; margin-bottom: 10px; }
+    .pt { background: #f1f5f9; color: #475569; font-size: .68rem; padding: 2px 7px; border-radius: 4px; }
+    .pet-desc { font-size: .78rem; color: var(--muted); line-height: 1.5; }
+    .no-results { text-align: center; color: var(--muted); padding: 32px; font-size: .9rem; }
+
+    /* Matchmaker */
+    .mm-head { margin-bottom: 20px; }
+    .mm-head h2 { font-size: 1.05rem; font-weight: 700; margin-bottom: 6px; }
+    .mm-head p { color: var(--muted); font-size: .85rem; }
+    .mm-select { width: 100%; max-width: 420px; padding: 10px 36px 10px 12px; border: 1px solid var(--border); border-radius: 8px; font-size: .88rem; appearance: none; background: var(--card) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath fill='%2364748b' d='M8 11L2 5h12z'/%3E%3C/svg%3E") no-repeat right 12px center / 11px; cursor: pointer; color: var(--text); }
+    .adopter-profile { background: linear-gradient(135deg,#f0f4ff,#faf5ff); border: 1px solid #c7d2fe; border-radius: 10px; padding: 16px; margin: 16px 0; }
+    .adopter-profile h3 { font-size: .9rem; font-weight: 700; margin-bottom: 8px; }
+    .ptags { display: flex; flex-wrap: wrap; gap: 6px; }
+    .ptag { background: #e0e7ff; color: #3730a3; font-size: .72rem; padding: 3px 10px; border-radius: 6px; }
+    .match-card { background: var(--card); border: 1px solid var(--border); border-radius: 10px; padding: 16px; margin-bottom: 12px; display: flex; align-items: flex-start; gap: 14px; transition: box-shadow .2s; }
+    .match-card:hover { box-shadow: 0 4px 18px rgba(0,0,0,.1); }
+    .m-rank { font-size: 1.5rem; font-weight: 900; color: #cbd5e1; min-width: 36px; text-align: center; padding-top: 2px; }
+    .m-emoji { font-size: 2rem; min-width: 40px; text-align: center; }
+    .m-info { flex: 1; }
+    .m-name { font-weight: 700; font-size: .98rem; }
+    .m-sub { font-size: .78rem; color: var(--muted); margin-top: 3px; }
+    .m-criteria { display: flex; gap: 4px; flex-wrap: wrap; margin-top: 8px; }
+    .mc { font-size: .68rem; padding: 2px 7px; border-radius: 4px; }
+    .mc-hit { background: #dcfce7; color: #166534; }
+    .mc-miss { background: #fee2e2; color: #991b1b; }
+    .m-score { text-align: right; min-width: 80px; }
+
+    /* SQL Explorer */
+    .sql-top { display: flex; gap: 12px; flex-wrap: wrap; align-items: flex-end; margin-bottom: 12px; }
+    .sql-top label { font-size: .78rem; font-weight: 600; color: var(--muted); display: block; margin-bottom: 4px; }
+    .qsel { padding: 8px 12px; border: 1px solid var(--border); border-radius: 8px; font-size: .84rem; min-width: 240px; color: var(--text); background: var(--card); }
+    .run-btn { background: var(--primary); color: #fff; border: none; padding: 10px 22px; border-radius: 8px; font-size: .88rem; font-weight: 600; cursor: pointer; transition: background .2s; }
+    .run-btn:hover { background: var(--primary-dark); }
+    .sql-ta { width: 100%; min-height: 130px; padding: 12px; font-family: 'Cascadia Code','Fira Code','Courier New',monospace; font-size: .8rem; border: 1px solid var(--border); border-radius: 8px; resize: vertical; background: #0f172a; color: #e2e8f0; line-height: 1.65; outline: none; }
+    .sql-ta:focus { border-color: var(--primary); }
+    .sql-hint { font-size: .78rem; color: var(--muted); margin-bottom: 10px; }
+    .sql-results { margin-top: 16px; }
+    .results-meta { font-size: .78rem; color: var(--muted); margin-bottom: 8px; }
+    .err-msg { background: #fee2e2; color: #991b1b; padding: 12px; border-radius: 8px; font-size: .85rem; font-family: monospace; }
+
+    /* Dashboard grid */
+    .dash-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+    @media (max-width: 700px) { .dash-grid { grid-template-columns: 1fr; } }
+
+    /* Footer */
+    footer { text-align: center; padding: 24px; color: var(--muted); font-size: .78rem; border-top: 1px solid var(--border); margin-top: 8px; }
+    footer a { color: var(--primary); text-decoration: none; }
+  </style>
+</head>
+<body>
+
+<!-- Loading screen -->
+<div id="loading">
+  <div class="paw-spin">🐾</div>
+  <p>Initialising in-browser database…</p>
+</div>
+
+<!-- App -->
+<div id="app" style="display:none">
+  <header>
+    <div class="hdr">
+      <div class="hdr-left">
+        <div class="logo">🐾</div>
+        <div>
+          <h1>Pet Adoption Matchmaker</h1>
+          <p>SQL-powered compatibility engine — live in-browser demo</p>
+          <div class="badges">
+            <span class="badge-pill">SQLite (sql.js)</span>
+            <span class="badge-pill">15 Pets</span>
+            <span class="badge-pill">10 Adopters</span>
+            <span class="badge-pill">7-criterion Scoring</span>
+          </div>
+        </div>
+      </div>
+      <a href="https://github.com/Hiruthickroshan/Pet-Adoption-Matchmaker" target="_blank" rel="noopener" class="gh-btn">⭐ View on GitHub</a>
+    </div>
+  </header>
+
+  <nav class="tabs">
+    <button class="tab-btn active" onclick="showTab('dashboard')">📊 Dashboard</button>
+    <button class="tab-btn" onclick="showTab('pets')">🐾 Pets</button>
+    <button class="tab-btn" onclick="showTab('adopters')">👥 Adopters</button>
+    <button class="tab-btn" onclick="showTab('matchmaker')">🤝 Matchmaker</button>
+    <button class="tab-btn" onclick="showTab('sql')">💻 SQL Explorer</button>
+  </nav>
+
+  <main>
+    <!-- Dashboard -->
+    <div id="tab-dashboard" class="tab-panel active">
+      <div class="stats-grid" id="stats-grid"></div>
+      <div class="dash-grid">
+        <div class="card">
+          <div class="card-title">🤝 Recent Matches</div>
+          <div class="table-wrap" id="recent-matches"></div>
+        </div>
+        <div class="card">
+          <div class="card-title">📈 Species Overview</div>
+          <div class="table-wrap" id="species-overview"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Pets -->
+    <div id="tab-pets" class="tab-panel">
+      <div class="filter-bar" id="pet-filters"></div>
+      <div class="pets-grid" id="pets-grid"></div>
+    </div>
+
+    <!-- Adopters -->
+    <div id="tab-adopters" class="tab-panel">
+      <div class="card">
+        <div class="card-title">👥 All Adopters</div>
+        <div class="table-wrap" id="adopters-table"></div>
+      </div>
+    </div>
+
+    <!-- Matchmaker -->
+    <div id="tab-matchmaker" class="tab-panel">
+      <div class="card">
+        <div class="mm-head">
+          <h2>🤝 Find the Perfect Pet Match</h2>
+          <p>Select an adopter to see their top-5 compatible pets, ranked by a 7-criterion compatibility score.</p>
+        </div>
+        <select class="mm-select" id="adopter-select" onchange="renderMatchResults()">
+          <option value="">— Select an Adopter —</option>
+        </select>
+        <div id="match-results"></div>
+      </div>
+    </div>
+
+    <!-- SQL Explorer -->
+    <div id="tab-sql" class="tab-panel">
+      <div class="card">
+        <div class="card-title">💻 SQL Explorer</div>
+        <p class="sql-hint">The database runs live in your browser via SQLite (sql.js). Choose a pre-built query or write your own!</p>
+        <div class="sql-top">
+          <div>
+            <label>Pre-built Queries</label>
+            <select class="qsel" id="query-select" onchange="loadPrebuiltQuery()">
+              <option value="">— Select a query —</option>
+              <option value="q1">1 · All scores for available pets</option>
+              <option value="q2">2 · Top-5 pets for Adopter #1 (Arun Kumar)</option>
+              <option value="q3">3 · Best adopters for Pet #1 (Buddy)</option>
+              <option value="q4">4 · Full match report</option>
+              <option value="q5">5 · Unmatched available pets</option>
+              <option value="q6">6 · Availability summary by species</option>
+              <option value="q7">7 · Top-ranked match per adopter (window fn)</option>
+              <option value="q8">8 · High-scoring suggestions not yet acted upon</option>
+              <option value="q9">9 · Browse all pets</option>
+              <option value="q10">10 · Browse all adopters</option>
+            </select>
+          </div>
+          <button class="run-btn" onclick="runSqlExplorer()">▶ Run</button>
+        </div>
+        <textarea class="sql-ta" id="sql-input" spellcheck="false" placeholder="SELECT * FROM Pets LIMIT 10;"></textarea>
+        <div class="sql-results" id="sql-results"></div>
+      </div>
+    </div>
+  </main>
+
+  <footer>
+    Built by <a href="https://github.com/Hiruthickroshan" target="_blank" rel="noopener">Hiruthickroshan E.</a>
+    &nbsp;·&nbsp; Powered by <a href="https://sql.js.org" target="_blank" rel="noopener">sql.js</a> (SQLite in WebAssembly)
+    &nbsp;·&nbsp; No server — runs entirely in your browser
+  </footer>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/sql.js/1.10.2/sql-wasm.js"
+        integrity="sha512-VYs2RuvWreNg7oouVhZ/9bEvdPgyd5L2iCPCB8+8Sy3OPBJDs7BbSmtFDRkpFa0gFsBpjSCZPHIvcmUVeOp3A=="
+        crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+<script>
+'use strict';
+
+/* =========================================================
+   SQL — SQLite-compatible versions of schema, seed, view
+   ========================================================= */
+
+const SCHEMA_SQL = `
+PRAGMA foreign_keys = ON;
+
+DROP TABLE IF EXISTS Matches;
+DROP TABLE IF EXISTS Adopters;
+DROP TABLE IF EXISTS Pets;
+
+CREATE TABLE Pets (
+    pet_id          INTEGER PRIMARY KEY AUTOINCREMENT,
+    name            TEXT    NOT NULL,
+    species         TEXT    NOT NULL,
+    breed           TEXT,
+    age_years       REAL    NOT NULL CHECK (age_years >= 0),
+    size            TEXT    NOT NULL CHECK (size IN ('Small','Medium','Large')),
+    energy_level    TEXT    NOT NULL CHECK (energy_level IN ('Low','Medium','High')),
+    good_with_kids  INTEGER NOT NULL DEFAULT 0,
+    good_with_pets  INTEGER NOT NULL DEFAULT 0,
+    indoor_friendly INTEGER NOT NULL DEFAULT 1,
+    description     TEXT,
+    status          TEXT    NOT NULL DEFAULT 'Available'
+                        CHECK (status IN ('Available','Pending','Adopted')),
+    created_at      TEXT    NOT NULL DEFAULT (datetime('now'))
+);
+
+CREATE TABLE Adopters (
+    adopter_id        INTEGER PRIMARY KEY AUTOINCREMENT,
+    full_name         TEXT    NOT NULL,
+    email             TEXT    NOT NULL UNIQUE,
+    phone             TEXT,
+    living_space      TEXT    NOT NULL CHECK (living_space IN ('Apartment','House','Farm')),
+    has_yard          INTEGER NOT NULL DEFAULT 0,
+    activity_level    TEXT    NOT NULL CHECK (activity_level IN ('Sedentary','Moderate','Active')),
+    has_children      INTEGER NOT NULL DEFAULT 0,
+    has_other_pets    INTEGER NOT NULL DEFAULT 0,
+    preferred_species TEXT,
+    preferred_size    TEXT    NOT NULL DEFAULT 'Any'
+                          CHECK (preferred_size IN ('Small','Medium','Large','Any')),
+    preferred_energy  TEXT    NOT NULL DEFAULT 'Any'
+                          CHECK (preferred_energy IN ('Low','Medium','High','Any')),
+    experience_level  TEXT    NOT NULL DEFAULT 'Novice'
+                          CHECK (experience_level IN ('Novice','Intermediate','Expert')),
+    created_at        TEXT    NOT NULL DEFAULT (datetime('now'))
+);
+
+CREATE TABLE Matches (
+    match_id             INTEGER PRIMARY KEY AUTOINCREMENT,
+    pet_id               INTEGER NOT NULL REFERENCES Pets(pet_id)     ON DELETE CASCADE,
+    adopter_id           INTEGER NOT NULL REFERENCES Adopters(adopter_id) ON DELETE CASCADE,
+    compatibility_score  INTEGER NOT NULL CHECK (compatibility_score BETWEEN 0 AND 100),
+    status               TEXT    NOT NULL DEFAULT 'Suggested'
+                             CHECK (status IN ('Suggested','Approved','Rejected','Adopted')),
+    matched_at           TEXT    NOT NULL DEFAULT (datetime('now')),
+    notes                TEXT,
+    UNIQUE (pet_id, adopter_id)
+);
+`;
+
+const SEED_SQL = `
+INSERT INTO Pets (name,species,breed,age_years,size,energy_level,good_with_kids,good_with_pets,indoor_friendly,description,status) VALUES
+  ('Buddy',   'Dog',    'Golden Retriever',   3.0,  'Large',  'High',   1,1,0,'Loves outdoor runs and playing fetch.',               'Available'),
+  ('Milo',    'Dog',    'Beagle',             2.5,  'Medium', 'Medium', 1,1,1,'Friendly and curious, great family dog.',             'Available'),
+  ('Bella',   'Cat',    'Persian',            4.0,  'Small',  'Low',    0,0,1,'Calm and independent, perfect for quiet homes.',     'Available'),
+  ('Max',     'Dog',    'Border Collie',      1.5,  'Medium', 'High',   1,0,0,'Highly intelligent, needs lots of mental stimulation.','Available'),
+  ('Luna',    'Cat',    'Siamese',            2.0,  'Small',  'Medium', 1,1,1,'Social and vocal, loves human interaction.',          'Available'),
+  ('Rocky',   'Dog',    'Bulldog',            5.0,  'Medium', 'Low',    1,1,1,'Laid-back couch companion.',                         'Available'),
+  ('Cleo',    'Rabbit', 'Holland Lop',        1.0,  'Small',  'Low',    1,0,1,'Gentle and quiet, ideal for small apartments.',      'Available'),
+  ('Charlie', 'Dog',    'Labrador Retriever', 4.0,  'Large',  'High',   1,1,0,'Energetic and loyal, loves swimming.',                'Available'),
+  ('Daisy',   'Cat',    'Maine Coon',         3.5,  'Medium', 'Low',    1,1,1,'Friendly giant, great with children.',               'Available'),
+  ('Oliver',  'Bird',   'African Grey',       6.0,  'Small',  'Low',    0,0,1,'Highly intelligent, requires attentive owner.',      'Available'),
+  ('Nala',    'Dog',    'Shih Tzu',           2.0,  'Small',  'Low',    1,1,1,'Affectionate lap dog, great for seniors.',           'Available'),
+  ('Leo',     'Cat',    'Bengal',             1.5,  'Medium', 'High',   0,0,1,'Active and playful, needs enrichment toys.',         'Available'),
+  ('Sophie',  'Dog',    'German Shepherd',    3.0,  'Large',  'Medium', 1,0,0,'Loyal protector, responds well to training.',        'Available'),
+  ('Ginger',  'Rabbit', 'Rex',                2.0,  'Small',  'Medium', 1,0,1,'Curious and social, enjoys gentle handling.',        'Available'),
+  ('Simba',   'Cat',    'Scottish Fold',      4.0,  'Small',  'Low',    1,1,1,'Quiet and loving, perfect indoor companion.',        'Adopted');
+
+INSERT INTO Adopters (full_name,email,phone,living_space,has_yard,activity_level,has_children,has_other_pets,preferred_species,preferred_size,preferred_energy,experience_level) VALUES
+  ('Arun Kumar',    'arun.kumar@email.com',   '9876543210','House',     1,'Active',    1,0,'Dog',   'Large', 'High',  'Intermediate'),
+  ('Priya Sharma',  'priya.sharma@email.com', '9876543211','Apartment', 0,'Sedentary', 0,1,'Cat',   'Small', 'Low',   'Novice'),
+  ('Ravi Patel',    'ravi.patel@email.com',   '9876543212','House',     1,'Moderate',  1,1,'Dog',   'Medium','Medium','Expert'),
+  ('Meena Nair',    'meena.nair@email.com',   '9876543213','Apartment', 0,'Sedentary', 0,0,'Cat',   'Small', 'Low',   'Novice'),
+  ('Karthik Reddy', 'karthik.r@email.com',    '9876543214','Farm',      1,'Active',    1,1,'Dog',   'Large', 'High',  'Expert'),
+  ('Divya Iyer',    'divya.iyer@email.com',   '9876543215','Apartment', 0,'Moderate',  1,0,'Rabbit','Small', 'Low',   'Novice'),
+  ('Suresh Menon',  'suresh.menon@email.com', '9876543216','House',     1,'Moderate',  0,1,'Dog',   'Medium','Low',   'Intermediate'),
+  ('Lakshmi Devi',  'lakshmi.d@email.com',    '9876543217','House',     0,'Sedentary', 0,1,'Cat',   'Medium','Low',   'Novice'),
+  ('Vijay Bose',    'vijay.bose@email.com',   '9876543218','Apartment', 0,'Active',    0,0,'Bird',  'Small', 'Low',   'Expert'),
+  ('Ananya Singh',  'ananya.s@email.com',     '9876543219','House',     1,'Moderate',  1,0,'Dog',   'Any',   'Any',   'Intermediate');
+
+INSERT INTO Matches (pet_id,adopter_id,compatibility_score,status,notes) VALUES
+  (1,  1, 95,'Approved', 'Excellent lifestyle match — outdoor space and energy align.'),
+  (3,  2, 92,'Approved', 'Quiet apartment environment suits Bella perfectly.'),
+  (6,  7, 88,'Suggested','Temperament and energy level are a strong match.'),
+  (7,  6, 85,'Suggested','Indoor rabbit matches apartment lifestyle well.'),
+  (10, 9, 90,'Approved', 'Expert level owner well-suited for intelligent parrot.'),
+  (8,  5, 97,'Adopted',  'Perfect farm and activity match — adoption completed.'),
+  (9,  8, 83,'Suggested','Calm cat suits quiet household.'),
+  (2,  3, 89,'Approved', 'Family home with yard is ideal for Milo.');
+`;
+
+const VIEW_SQL = `
+DROP VIEW IF EXISTS pet_adopter_scores;
+CREATE VIEW pet_adopter_scores AS
+SELECT
+    p.pet_id,
+    p.name            AS pet_name,
+    p.species,
+    p.breed,
+    p.age_years,
+    p.size,
+    p.energy_level,
+    p.good_with_kids,
+    p.good_with_pets,
+    p.indoor_friendly,
+    p.status          AS pet_status,
+    a.adopter_id,
+    a.full_name       AS adopter_name,
+    a.email,
+    a.living_space,
+    a.activity_level,
+    a.experience_level,
+    (
+      CASE WHEN a.preferred_species IS NULL
+                OR LOWER(a.preferred_species) = LOWER(p.species) THEN 20 ELSE 0 END
+    + CASE WHEN a.preferred_size   = 'Any' OR a.preferred_size   = p.size         THEN 20 ELSE 0 END
+    + CASE WHEN a.preferred_energy = 'Any' OR a.preferred_energy = p.energy_level THEN 20 ELSE 0 END
+    + CASE WHEN a.has_children  = 0                                    THEN 15
+           WHEN a.has_children  = 1 AND p.good_with_kids = 1           THEN 15
+           ELSE 0 END
+    + CASE WHEN a.has_other_pets = 0                                   THEN 10
+           WHEN a.has_other_pets = 1 AND p.good_with_pets = 1          THEN 10
+           ELSE 0 END
+    + CASE WHEN a.living_space = 'Apartment' AND p.indoor_friendly = 1 THEN 10
+           WHEN a.living_space IN ('House','Farm')                      THEN 10
+           ELSE 0 END
+    + CASE WHEN a.activity_level = 'Active'    AND p.energy_level = 'High'   THEN 5
+           WHEN a.activity_level = 'Moderate'  AND p.energy_level = 'Medium' THEN 5
+           WHEN a.activity_level = 'Sedentary' AND p.energy_level = 'Low'    THEN 5
+           ELSE 0 END
+    ) AS compatibility_score
+FROM  Pets     p
+CROSS JOIN Adopters a;
+`;
+
+/* Pre-built queries (SQLite-compatible) */
+const PREBUILT = {
+  q1: `-- Query 1: All scores for available pets, ordered per adopter
+SELECT pet_id, pet_name, species, breed, size, energy_level,
+       adopter_id, adopter_name, compatibility_score
+FROM   pet_adopter_scores
+WHERE  pet_status = 'Available'
+ORDER  BY adopter_id, compatibility_score DESC;`,
+
+  q2: `-- Query 2: Top-5 pets for Adopter #1 (Arun Kumar)
+SELECT pet_id, pet_name, species, breed, age_years,
+       size, energy_level, compatibility_score
+FROM   pet_adopter_scores
+WHERE  pet_status = 'Available'
+  AND  adopter_id = 1
+ORDER  BY compatibility_score DESC
+LIMIT  5;`,
+
+  q3: `-- Query 3: Best adopters for Pet #1 (Buddy)
+SELECT adopter_id, adopter_name, email, living_space,
+       activity_level, experience_level, compatibility_score
+FROM   pet_adopter_scores
+WHERE  pet_id = 1
+ORDER  BY compatibility_score DESC
+LIMIT  5;`,
+
+  q4: `-- Query 4: Full match report
+SELECT m.match_id,
+       p.name          AS pet_name,  p.species, p.breed,
+       p.age_years,    p.size,       p.energy_level,
+       a.full_name     AS adopter_name, a.email,
+       a.living_space, a.activity_level,
+       m.compatibility_score, m.status AS match_status,
+       m.matched_at,   m.notes
+FROM   Matches  m
+JOIN   Pets     p ON p.pet_id     = m.pet_id
+JOIN   Adopters a ON a.adopter_id = m.adopter_id
+ORDER  BY m.compatibility_score DESC;`,
+
+  q5: `-- Query 5: Available pets with no match yet
+SELECT p.pet_id, p.name, p.species, p.breed, p.status, p.created_at
+FROM   Pets p
+WHERE  p.status = 'Available'
+  AND  NOT EXISTS (
+         SELECT 1 FROM Matches m WHERE m.pet_id = p.pet_id
+       )
+ORDER  BY p.created_at;`,
+
+  q6: `-- Query 6: Availability summary by species
+SELECT species,
+       COUNT(*) AS total_pets,
+       SUM(CASE WHEN status = 'Available' THEN 1 ELSE 0 END) AS available,
+       SUM(CASE WHEN status = 'Pending'   THEN 1 ELSE 0 END) AS pending,
+       SUM(CASE WHEN status = 'Adopted'   THEN 1 ELSE 0 END) AS adopted
+FROM   Pets
+GROUP  BY species
+ORDER  BY total_pets DESC;`,
+
+  q7: `-- Query 7: Top-ranked match per adopter (window function)
+SELECT adopter_id, adopter_name, pet_id, pet_name,
+       species, breed, compatibility_score
+FROM (
+    SELECT *,
+           ROW_NUMBER() OVER (
+               PARTITION BY adopter_id
+               ORDER BY compatibility_score DESC
+           ) AS rnk
+    FROM   pet_adopter_scores
+    WHERE  pet_status = 'Available'
+) ranked
+WHERE  rnk = 1
+ORDER  BY compatibility_score DESC;`,
+
+  q8: `-- Query 8: High-scoring suggestions not yet acted upon (score >= 80)
+SELECT m.match_id,
+       p.name           AS pet_name,  p.species,
+       a.full_name      AS adopter_name, a.email,
+       m.compatibility_score, m.matched_at
+FROM   Matches  m
+JOIN   Pets     p ON p.pet_id     = m.pet_id
+JOIN   Adopters a ON a.adopter_id = m.adopter_id
+WHERE  m.status             = 'Suggested'
+  AND  m.compatibility_score >= 80
+ORDER  BY m.compatibility_score DESC;`,
+
+  q9: `SELECT * FROM Pets ORDER BY pet_id;`,
+  q10:`SELECT * FROM Adopters ORDER BY adopter_id;`
+};
+
+/* =========================================================
+   Global state
+   ========================================================= */
+let db;
+let petFilter = { species: 'All', status: 'All' };
+
+/* =========================================================
+   Helpers
+   ========================================================= */
+function runQuery(sql, params) {
+  const stmt = db.prepare(sql);
+  if (params) stmt.bind(params);
+  const rows = [];
+  while (stmt.step()) rows.push(stmt.getAsObject());
+  stmt.free();
+  return rows;
+}
+
+function scoreColor(s) {
+  if (s >= 90) return '#22c55e';
+  if (s >= 75) return '#3b82f6';
+  if (s >= 60) return '#f59e0b';
+  return '#ef4444';
+}
+
+function statusBadge(s) {
+  const map = { Available:'b-g', Pending:'b-y', Adopted:'b-p', Approved:'b-g', Suggested:'b-b', Rejected:'b-r' };
+  return `<span class="b ${map[s]||'b-s'}">${s}</span>`;
+}
+
+function petEmoji(species) {
+  const map = { Dog:'🐕', Cat:'🐈', Rabbit:'🐇', Bird:'🦜' };
+  return map[species] || '🐾';
+}
+
+function boolIcon(v) {
+  return v ? '<span style="color:#22c55e">✓</span>' : '<span style="color:#ef4444">✗</span>';
+}
+
+function scoreBar(score) {
+  const color = scoreColor(score);
+  return `<div class="sc-wrap">
+    <div class="sc-bg"><div class="sc-fill" style="width:${score}%;background:${color}"></div></div>
+    <span class="sc-num" style="color:${color}">${score}</span>
+  </div>`;
+}
+
+function makeTable(rows, cols) {
+  if (!rows.length) return '<p class="no-results">No rows returned.</p>';
+  const headers = cols || Object.keys(rows[0]);
+  const ths = headers.map(h => `<th>${h}</th>`).join('');
+  const trs = rows.map(r => {
+    const tds = headers.map(h => {
+      let v = r[h];
+      if (v === null || v === undefined) v = '<span style="color:#cbd5e1">NULL</span>';
+      if (h === 'status' || h === 'match_status' || h === 'pet_status') return `<td>${statusBadge(v)}</td>`;
+      if (h === 'compatibility_score') return `<td>${scoreBar(Number(v))}</td>`;
+      if (h === 'good_with_kids' || h === 'good_with_pets' || h === 'indoor_friendly' ||
+          h === 'has_yard' || h === 'has_children' || h === 'has_other_pets')
+        return `<td>${boolIcon(v)}</td>`;
+      return `<td>${v}</td>`;
+    }).join('');
+    return `<tr>${tds}</tr>`;
+  }).join('');
+  return `<table><thead><tr>${ths}</tr></thead><tbody>${trs}</tbody></table>`;
+}
+
+/* =========================================================
+   Tab navigation
+   ========================================================= */
+function showTab(id) {
+  document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('tab-' + id).classList.add('active');
+  const btns = document.querySelectorAll('.tab-btn');
+  const labels = { dashboard:0, pets:1, adopters:2, matchmaker:3, sql:4 };
+  btns[labels[id]].classList.add('active');
+}
+
+/* =========================================================
+   Dashboard
+   ========================================================= */
+function renderDashboard() {
+  const totalPets  = runQuery("SELECT COUNT(*) AS n FROM Pets")[0].n;
+  const available  = runQuery("SELECT COUNT(*) AS n FROM Pets WHERE status='Available'")[0].n;
+  const adopters   = runQuery("SELECT COUNT(*) AS n FROM Adopters")[0].n;
+  const matches    = runQuery("SELECT COUNT(*) AS n FROM Matches")[0].n;
+  const topScore   = runQuery("SELECT MAX(compatibility_score) AS n FROM Matches")[0].n || 0;
+
+  const statsEl = document.getElementById('stats-grid');
+  statsEl.innerHTML = [
+    { icon:'🐾', val: totalPets,  label:'Total Pets' },
+    { icon:'✅', val: available,  label:'Available Now' },
+    { icon:'👥', val: adopters,   label:'Adopters' },
+    { icon:'🏆', val: topScore+'pts', label:'Best Match Score' }
+  ].map(s => `
+    <div class="stat-card">
+      <div class="si">${s.icon}</div>
+      <div class="sv">${s.val}</div>
+      <div class="sl">${s.label}</div>
+    </div>`).join('');
+
+  // Recent matches
+  const matchRows = runQuery(`
+    SELECT m.match_id, p.name AS pet, p.species,
+           a.full_name AS adopter, m.compatibility_score, m.status
+    FROM   Matches m
+    JOIN   Pets     p ON p.pet_id     = m.pet_id
+    JOIN   Adopters a ON a.adopter_id = m.adopter_id
+    ORDER  BY m.compatibility_score DESC`);
+  document.getElementById('recent-matches').innerHTML = makeTable(matchRows);
+
+  // Species overview
+  const speciesRows = runQuery(`
+    SELECT species,
+           COUNT(*) AS total,
+           SUM(CASE WHEN status='Available' THEN 1 ELSE 0 END) AS available,
+           SUM(CASE WHEN status='Adopted'   THEN 1 ELSE 0 END) AS adopted
+    FROM   Pets GROUP BY species ORDER BY total DESC`);
+  document.getElementById('species-overview').innerHTML = makeTable(speciesRows);
+}
+
+/* =========================================================
+   Pets tab
+   ========================================================= */
+function renderPetFilters() {
+  const species = ['All', 'Dog', 'Cat', 'Rabbit', 'Bird'];
+  const statuses = ['All', 'Available', 'Adopted'];
+  const bar = document.getElementById('pet-filters');
+  const speciesBtns = species.map(s =>
+    `<button class="fbtn${petFilter.species===s?' active':''}" onclick="setPetFilter('species','${s}')">${s==='Dog'?'🐕':s==='Cat'?'🐈':s==='Rabbit'?'🐇':s==='Bird'?'🦜':''}${s==='All'?'All Species':' '+s}</button>`
+  ).join('');
+  const statusBtns = statuses.map(s =>
+    `<button class="fbtn${petFilter.status===s?' active':''}" onclick="setPetFilter('status','${s}')">${s==='All'?'All Statuses':s}</button>`
+  ).join('');
+  bar.innerHTML = speciesBtns + '<div class="fbtn-sep"></div>' + statusBtns;
+}
+
+function setPetFilter(key, val) {
+  petFilter[key] = val;
+  renderPetFilters();
+  renderPetCards();
+}
+
+function renderPetCards() {
+  let sql = "SELECT * FROM Pets WHERE 1=1";
+  const params = [];
+  if (petFilter.species !== 'All') { sql += " AND species = ?"; params.push(petFilter.species); }
+  if (petFilter.status  !== 'All') { sql += " AND status  = ?"; params.push(petFilter.status); }
+  sql += " ORDER BY pet_id";
+  const pets = runQuery(sql, params);
+  const grid = document.getElementById('pets-grid');
+  if (!pets.length) { grid.innerHTML = '<p class="no-results">No pets match the current filters.</p>'; return; }
+  grid.innerHTML = pets.map(p => {
+    const tags = [p.size, p.energy_level + ' energy', p.age_years + ' yrs',
+      p.good_with_kids ? '👧 kids' : null,
+      p.good_with_pets ? '🐾 pets' : null,
+      p.indoor_friendly ? '🏠 indoor' : '🌳 outdoor'
+    ].filter(Boolean).map(t => `<span class="pt">${t}</span>`).join('');
+    return `<div class="pet-card">
+      <div class="pet-emoji">${petEmoji(p.species)}</div>
+      <div class="pet-name">${p.name} ${statusBadge(p.status)}</div>
+      <div class="pet-breed">${p.breed || p.species}</div>
+      <div class="pet-tags">${tags}</div>
+      <div class="pet-desc">${p.description || ''}</div>
+    </div>`;
+  }).join('');
+}
+
+/* =========================================================
+   Adopters tab
+   ========================================================= */
+function renderAdopters() {
+  const rows = runQuery(`
+    SELECT adopter_id, full_name, living_space, has_yard, activity_level,
+           has_children, has_other_pets,
+           COALESCE(preferred_species,'Any') AS pref_species,
+           preferred_size, preferred_energy, experience_level
+    FROM   Adopters ORDER BY adopter_id`);
+  document.getElementById('adopters-table').innerHTML = makeTable(rows);
+}
+
+/* =========================================================
+   Matchmaker tab
+   ========================================================= */
+function populateAdopterDropdown() {
+  const adopters = runQuery("SELECT adopter_id, full_name FROM Adopters ORDER BY adopter_id");
+  const sel = document.getElementById('adopter-select');
+  adopters.forEach(a => {
+    const opt = document.createElement('option');
+    opt.value = a.adopter_id;
+    opt.textContent = `${a.adopter_id}. ${a.full_name}`;
+    sel.appendChild(opt);
+  });
+}
+
+function criteriaBreakdown(pet, adopter) {
+  const items = [
+    {
+      label: 'Species',
+      hit: !adopter.preferred_species || adopter.preferred_species.toLowerCase() === pet.species.toLowerCase()
+    },
+    {
+      label: 'Size',
+      hit: adopter.preferred_size === 'Any' || adopter.preferred_size === pet.size
+    },
+    {
+      label: 'Energy',
+      hit: adopter.preferred_energy === 'Any' || adopter.preferred_energy === pet.energy_level
+    },
+    {
+      label: 'Kid-safe',
+      hit: !adopter.has_children || !!pet.good_with_kids
+    },
+    {
+      label: 'Pet-friendly',
+      hit: !adopter.has_other_pets || !!pet.good_with_pets
+    },
+    {
+      label: 'Lifestyle',
+      hit: adopter.living_space !== 'Apartment' || !!pet.indoor_friendly
+    },
+    {
+      label: 'Activity',
+      hit: (adopter.activity_level === 'Active'    && pet.energy_level === 'High') ||
+           (adopter.activity_level === 'Moderate'  && pet.energy_level === 'Medium') ||
+           (adopter.activity_level === 'Sedentary' && pet.energy_level === 'Low')
+    }
+  ];
+  return items.map(i =>
+    `<span class="mc ${i.hit ? 'mc-hit' : 'mc-miss'}">${i.hit ? '✓' : '✗'} ${i.label}</span>`
+  ).join('');
+}
+
+function renderMatchResults() {
+  const adopterId = document.getElementById('adopter-select').value;
+  const container = document.getElementById('match-results');
+  if (!adopterId) { container.innerHTML = ''; return; }
+
+  const [adopter] = runQuery("SELECT * FROM Adopters WHERE adopter_id = ?", [adopterId]);
+  if (!adopter) { container.innerHTML = ''; return; }
+
+  const medals = ['🥇','🥈','🥉','4','5'];
+  const profileHtml = `
+    <div class="adopter-profile">
+      <h3>👤 ${adopter.full_name}</h3>
+      <div class="ptags">
+        <span class="ptag">🏠 ${adopter.living_space}${adopter.has_yard ? ' + yard' : ''}</span>
+        <span class="ptag">⚡ ${adopter.activity_level}</span>
+        <span class="ptag">🎓 ${adopter.experience_level}</span>
+        ${adopter.preferred_species ? `<span class="ptag">🐾 Prefers ${adopter.preferred_species}</span>` : ''}
+        ${adopter.preferred_size !== 'Any' ? `<span class="ptag">📏 ${adopter.preferred_size}</span>` : ''}
+        ${adopter.preferred_energy !== 'Any' ? `<span class="ptag">💥 ${adopter.preferred_energy} energy</span>` : ''}
+        ${adopter.has_children ? '<span class="ptag">👧 Has children</span>' : ''}
+        ${adopter.has_other_pets ? '<span class="ptag">🐾 Has other pets</span>' : ''}
+      </div>
+    </div>`;
+
+  const matches = runQuery(`
+    SELECT pas.pet_id, pas.pet_name, pas.species, pas.breed, pas.age_years,
+           pas.size, pas.energy_level, pas.good_with_kids, pas.good_with_pets,
+           pas.indoor_friendly, pas.compatibility_score, p.description
+    FROM   pet_adopter_scores pas
+    JOIN   Pets p ON p.pet_id = pas.pet_id
+    WHERE  pas.pet_status = 'Available' AND pas.adopter_id = ?
+    ORDER  BY pas.compatibility_score DESC LIMIT 5`, [adopterId]);
+
+  if (!matches.length) {
+    container.innerHTML = profileHtml + '<p class="no-results">No available pets found.</p>';
+    return;
+  }
+
+  const matchCards = matches.map((m, i) => {
+    const color = scoreColor(m.compatibility_score);
+    return `
+      <div class="match-card">
+        <div class="m-rank">${medals[i]}</div>
+        <div class="m-emoji">${petEmoji(m.species)}</div>
+        <div class="m-info">
+          <div class="m-name">${m.pet_name}
+            <span class="b b-s" style="font-size:.7rem">${m.species} · ${m.breed || ''}</span>
+          </div>
+          <div class="m-sub">${m.size} · ${m.energy_level} energy · ${m.age_years} yrs</div>
+          <div class="m-criteria">${criteriaBreakdown(m, adopter)}</div>
+        </div>
+        <div class="m-score">${scoreBar(m.compatibility_score)}</div>
+      </div>`;
+  }).join('');
+
+  container.innerHTML = profileHtml +
+    `<p style="font-size:.82rem;color:var(--muted);margin-bottom:12px">Top ${matches.length} compatible pets for <strong>${adopter.full_name}</strong>:</p>` +
+    matchCards;
+}
+
+/* =========================================================
+   SQL Explorer
+   ========================================================= */
+function loadPrebuiltQuery() {
+  const key = document.getElementById('query-select').value;
+  if (key && PREBUILT[key]) {
+    document.getElementById('sql-input').value = PREBUILT[key];
+    runSqlExplorer();
+  }
+}
+
+function runSqlExplorer() {
+  const sql = document.getElementById('sql-input').value.trim();
+  const container = document.getElementById('sql-results');
+  if (!sql) { container.innerHTML = ''; return; }
+  try {
+    const results = db.exec(sql);
+    if (!results.length) {
+      container.innerHTML = '<p class="results-meta">Query executed successfully (no rows returned).</p>';
+      return;
+    }
+    let html = '';
+    results.forEach(r => {
+      const rows = r.values.map(v => {
+        const obj = {};
+        r.columns.forEach((c, i) => obj[c] = v[i]);
+        return obj;
+      });
+      html += `<p class="results-meta">${rows.length} row${rows.length!==1?'s':''} returned</p>`;
+      html += makeTable(rows, r.columns);
+    });
+    container.innerHTML = html;
+  } catch (e) {
+    container.innerHTML = `<div class="err-msg">⚠ ${e.message}</div>`;
+  }
+}
+
+/* =========================================================
+   Init
+   ========================================================= */
+async function init() {
+  try {
+    const SQL = await initSqlJs({
+      locateFile: f => `https://cdnjs.cloudflare.com/ajax/libs/sql.js/1.10.2/${f}`
+    });
+    db = new SQL.Database();
+    db.exec(SCHEMA_SQL);
+    db.exec(SEED_SQL);
+    db.exec(VIEW_SQL);
+
+    renderDashboard();
+    renderPetFilters();
+    renderPetCards();
+    renderAdopters();
+    populateAdopterDropdown();
+
+    document.getElementById('loading').style.display = 'none';
+    document.getElementById('app').style.display = 'block';
+  } catch (e) {
+    document.getElementById('loading').innerHTML =
+      `<p style="font-size:1rem;max-width:360px;text-align:center">
+        ⚠ Failed to load sql.js. Please check your internet connection and reload.<br><br>
+        <small>${e.message}</small>
+      </p>`;
+  }
+}
+
+init();
+</script>
+</body>
+</html>
