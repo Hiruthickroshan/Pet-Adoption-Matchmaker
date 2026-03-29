@@ -48,7 +48,6 @@ Pet-Adoption-Matchmaker/
 | Database     | SQL (PostgreSQL / MySQL)    |
 | Query Engine | Standard SQL + Window funcs |
 | Schema Design| Relational / 3NF            |
-| Documentation| Markdown                    |
 
 ---
 
