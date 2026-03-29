@@ -24,6 +24,8 @@
     .paw-spin { font-size: 4rem; animation: spin 1.5s linear infinite; }
     @keyframes spin { to { transform: rotate(360deg); } }
     #loading p { font-size: 1rem; opacity: .85; }
+    .retry-btn { background: rgba(255,255,255,.2); color: #fff; border: 1px solid rgba(255,255,255,.4); padding: 10px 24px; border-radius: 8px; font-size: .9rem; font-weight: 600; cursor: pointer; margin-top: 8px; transition: background .2s; }
+    .retry-btn:hover { background: rgba(255,255,255,.35); }
 
     /* Header */
     header { background: linear-gradient(135deg,#667eea,#764ba2); color: #fff; padding: 22px 24px; }
@@ -228,7 +230,7 @@
     <div id="tab-sql" class="tab-panel">
       <div class="card">
         <div class="card-title">💻 SQL Explorer</div>
-        <p class="sql-hint">The database runs live in your browser via SQLite (sql.js). Choose a pre-built query or write your own!</p>
+        <p class="sql-hint">The database runs live in your browser via SQLite (sql.js). Choose a pre-built query or write your own! Press <kbd style="background:#e2e8f0;color:#475569;padding:1px 5px;border-radius:3px;font-size:.72rem">Ctrl+Enter</kbd> to run.</p>
         <div class="sql-top">
           <div>
             <label>Pre-built Queries</label>
@@ -247,6 +249,7 @@
             </select>
           </div>
           <button class="run-btn" onclick="runSqlExplorer()">▶ Run</button>
+          <button class="run-btn" style="background:var(--muted)" onclick="clearSqlExplorer()">✕ Clear</button>
         </div>
         <textarea class="sql-ta" id="sql-input" spellcheck="false" placeholder="SELECT * FROM Pets LIMIT 10;"></textarea>
         <div class="sql-results" id="sql-results"></div>
@@ -261,9 +264,7 @@
   </footer>
 </div>
 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/sql.js/1.10.2/sql-wasm.js"
-        integrity="sha512-z4PhNX7vuL3xVChQ1m2AB9Yg5AULVxXcg/SpIdNs6c5H0NE8XYXysP+DGNKHfuwvY7kxvUdBeoGlODJ6+SfaPg=="
-        crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+<script src="https://cdn.jsdelivr.net/npm/sql.js@1.10.2/dist/sql-wasm.js"></script>
 <script>
 'use strict';
 
@@ -833,14 +834,30 @@ function runSqlExplorer() {
   }
 }
 
+function clearSqlExplorer() {
+  document.getElementById('sql-input').value = '';
+  document.getElementById('sql-results').innerHTML = '';
+  document.getElementById('query-select').value = '';
+}
+
 /* =========================================================
    Init
    ========================================================= */
 async function init() {
+  // Ctrl+Enter keyboard shortcut for SQL Explorer
+  document.getElementById('sql-input').addEventListener('keydown', e => {
+    if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') {
+      e.preventDefault();
+      runSqlExplorer();
+    }
+  });
+
   try {
+    document.querySelector('#loading p').textContent = 'Loading SQLite engine…';
     const SQL = await initSqlJs({
-      locateFile: f => `https://cdnjs.cloudflare.com/ajax/libs/sql.js/1.10.2/${f}`
+      locateFile: f => `https://cdn.jsdelivr.net/npm/sql.js@1.10.2/dist/${f}`
     });
+    document.querySelector('#loading p').textContent = 'Building in-browser database…';
     db = new SQL.Database();
     db.exec(SCHEMA_SQL);
     db.exec(SEED_SQL);
@@ -856,10 +873,13 @@ async function init() {
     document.getElementById('app').style.display = 'block';
   } catch (e) {
     document.getElementById('loading').innerHTML =
-      `<p style="font-size:1rem;max-width:360px;text-align:center">
-        ⚠ Failed to load sql.js. Please check your internet connection and reload.<br><br>
-        <small>${e.message}</small>
-      </p>`;
+      `<div style="font-size:2.5rem">⚠️</div>
+       <p style="font-size:1rem;max-width:360px;text-align:center">
+         Failed to load the database engine.<br>
+         Please check your internet connection and try again.<br><br>
+         <small style="opacity:.75">${e.message}</small>
+       </p>
+       <button class="retry-btn" onclick="init()">↺ Retry</button>`;
   }
 }
 
