@@ -1,18 +1,23 @@
 # 🐾 Pet Adoption Matchmaker
 
+[![Live Demo](https://img.shields.io/badge/Live%20Demo-GitHub%20Pages-6366f1?style=for-the-badge&logo=github)](https://hiruthickroshan.github.io/Pet-Adoption-Matchmaker/)
+
 A robust SQL-based backend system designed to intelligently pair pets with adopters based on lifestyle compatibility, pet characteristics, and adopter preferences. The matchmaking engine uses structured queries to score and rank pet–adopter pairings so every animal finds the right home.
+
+> **🚀 Try the [Live Interactive Demo](https://hiruthickroshan.github.io/Pet-Adoption-Matchmaker/)** — the full database runs entirely in your browser via SQLite (sql.js). Browse pets, explore adopter profiles, run the matchmaking engine, and execute custom SQL queries — no installation required.
 
 ---
 
 ## 📋 Table of Contents
 
 - [Features](#features)
+- [Live Demo](#-live-demo)
 - [Project Structure](#project-structure)
 - [Tech Stack](#tech-stack)
 - [Database Schema](#database-schema)
-- [Getting Started](#getting-started)
-- [Example Queries](#example-queries)
-- [Author](#author)
+- [Getting Started](#-getting-started)
+- [Example Queries](#-example-queries)
+- [Author](#-author)
 
 ---
 
@@ -104,6 +109,29 @@ Records scored pairings between pets and adopters.
 | status              | VARCHAR(20) | Suggested / Approved / Rejected / Adopted|
 | matched_at          | TIMESTAMPTZ | When the match was created               |
 | notes               | TEXT        | Reviewer or system notes                 |
+
+---
+
+## 🌐 Live Demo
+
+The project includes an interactive browser demo deployed on GitHub Pages:
+
+**URL:** [https://hiruthickroshan.github.io/Pet-Adoption-Matchmaker/](https://hiruthickroshan.github.io/Pet-Adoption-Matchmaker/)
+
+| Tab | What you can do |
+|-----|----------------|
+| 📊 Dashboard | Live stats — available pets, active matches, best score, species breakdown |
+| 🐾 Pets | Filterable pet gallery (by species & status) |
+| 👥 Adopters | Full adopter profiles and preferences |
+| 🤝 Matchmaker | Pick any adopter → see top-5 compatible pets with score bars + 7-criterion breakdown |
+| 💻 SQL Explorer | Run all 10 pre-built queries or write custom SQL against the live in-browser database |
+
+### Enabling GitHub Pages
+
+1. Go to **Settings → Pages** in the repository.
+2. Under *Source*, select **Deploy from a branch**.
+3. Choose **main** branch and **/ (root)** folder.
+4. Save — the site will be live at the URL above within a minute.
 
 ---
 
